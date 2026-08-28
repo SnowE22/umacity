@@ -7,25 +7,14 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      background-color: var(--tg-theme-bg-color, #0b0f19);
-      color: var(--tg-theme-text-color, #f1f5f9);
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    .active-tab {
-      border-bottom: 2px solid #38bdf8;
-      color: #38bdf8;
-      font-weight: 600;
-    }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
+    body { background-color: #0b0f19; color: #f1f5f9; font-family: system-ui, sans-serif; }
+    .active-tab { border-bottom: 2px solid #38bdf8; color: #38bdf8; font-weight: 600; }
   </style>
 </head>
 <body class="pb-16 select-none text-xs">
 
-  <!-- Header -->
-  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md px-3 pt-2 pb-1.5 border-b border-slate-800">
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur px-3 pt-2 pb-1.5 border-b border-slate-800">
     <div class="flex items-center gap-2">
-      <!-- Поиск -->
       <div class="relative flex-1">
         <input id="searchInput" type="text" placeholder="Поиск по названию, тегу, автору..." 
                class="w-full pl-8 pr-3 py-1.5 bg-slate-800 rounded-lg text-xs border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-sky-500">
@@ -33,21 +22,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
       </div>
-
-      <!-- Случайный перевод -->
-      <button onclick="openRandomComic()" title="Случайный перевод"
-              class="px-2.5 py-1.5 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-lg text-white font-medium shadow active:scale-95 transition">
-        🎲
-      </button>
-
-      <!-- Админка -->
-      <button id="adminBtn" onclick="toggleAdminPrompt()" title="Режим админа"
-              class="p-1.5 bg-slate-800 rounded-lg text-slate-400 border border-slate-700 active:scale-95">
-        🔒
-      </button>
+      <button onclick="openRandomComic()" class="px-2.5 py-1.5 bg-sky-500 rounded-lg text-white font-medium shadow active:scale-95">🎲</button>
+      <button id="adminBtn" onclick="toggleAdminPrompt()" class="p-1.5 bg-slate-800 rounded-lg text-slate-400 border border-slate-700">🔒</button>
     </div>
 
-    <!-- Вкладки категорий -->
     <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-800/60">
       <div class="flex gap-4 text-xs text-slate-400">
         <button id="tabChrono" onclick="switchTab('chrono')" class="py-1 active-tab">По порядку (ТГ)</button>
@@ -60,22 +38,11 @@
     </div>
   </header>
 
-  <!-- Индикатор парсинга -->
-  <div id="statusBox" class="p-6 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-2">
-    <div class="w-5 h-5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-    <span id="statusText">Подключение к Telegram каналу и оглавлению Teletype...</span>
-  </div>
-
-  <!-- Сетка контента -->
   <main class="p-2.5">
-    <!-- Комиксы (Компактная книжная сетка) -->
     <div id="comicsGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2"></div>
-
-    <!-- Персонажи (Папки) -->
     <div id="charsGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 hidden"></div>
   </main>
 
-  <!-- Читалка -->
   <div id="readerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col">
     <div class="p-2.5 bg-slate-900/90 backdrop-blur flex justify-between items-center border-b border-slate-800">
       <button onclick="closeReader()" class="text-sky-400 text-xs font-medium">← Назад</button>
@@ -88,14 +55,13 @@
     <div id="readerPages" class="flex-1 overflow-y-auto p-2 space-y-2 flex flex-col items-center"></div>
   </div>
 
-  <!-- Модалка редактирования персонажа (Админка) -->
   <div id="adminCharModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-800 p-4 rounded-xl w-full max-w-sm border border-slate-700">
       <h3 class="text-sm font-semibold mb-3">Редактировать персонажа</h3>
-      <label class="block text-[11px] text-slate-400 mb-1">Отображаемое имя (RU):</label>
+      <label class="block text-[11px] text-slate-400 mb-1">Имя (RU):</label>
       <input type="text" id="editCharName" class="w-full p-2 bg-slate-900 rounded-lg text-xs text-white border border-slate-700 mb-3">
-      <label class="block text-[11px] text-slate-400 mb-1">Ссылка на аватарку / арт:</label>
-      <input type="text" id="editCharAvatar" placeholder="https://..." class="w-full p-2 bg-slate-900 rounded-lg text-xs text-white border border-slate-700 mb-4">
+      <label class="block text-[11px] text-slate-400 mb-1">Ссылка на аватарку:</label>
+      <input type="text" id="editCharAvatar" class="w-full p-2 bg-slate-900 rounded-lg text-xs text-white border border-slate-700 mb-4">
       <div class="flex justify-end gap-2">
         <button onclick="closeAdminCharModal()" class="px-3 py-1.5 rounded-lg bg-slate-700 text-slate-300">Отмена</button>
         <button onclick="saveCharacterData()" class="px-3 py-1.5 rounded-lg bg-sky-500 text-white font-medium">Сохранить</button>
@@ -109,177 +75,15 @@
 
     const ADMIN_PIN = "7777";
     let isAdmin = localStorage.getItem("uma_is_admin") === "true";
-
-    const DEFAULT_NAMES = {
-      "tokai_teio": "Токай Тейо",
-      "maruzensky": "Марузенски",
-      "silence_suzuka": "Сайленс Судзука",
-      "symboli_rudolf": "Символи Рудольф",
-      "oguri_cap": "Огури Кэп",
-      "special_week": "Спешиал Вик",
-      "mejiro_mcqueen": "Меджиро Маккуин",
-      "gold_ship": "Голд Шип",
-      "daiwa_scarlet": "Дайва Скарлет",
-      "vodka": "Водка",
-      "sakura_chiyono_o": "Сакура Чиёно О",
-      "rice_shower": "Райс Шауэр",
-      "twin_turbo": "Твин Турбо",
-      "manhattan_cafe": "Манхэттен Кафе",
-      "agnes_tachyon": "Агнес Тахион",
-      "tamamo_cross": "Тамамо Кросс",
-      "super_creek": "Супер Крик",
-      "mayano_top_gun": "Маяно Топ Ган",
-      "mejiro_ardan": "Меджиро Ардан",
-      "satono_diamond": "Сатоно Даймонд",
-      "kitasan_black": "Китасан Блэк"
-    };
+    let customNames = JSON.parse(localStorage.getItem("uma_custom_names") || "{}");
+    let customAvatars = JSON.parse(localStorage.getItem("uma_custom_avatars") || "{}");
 
     let allComics = [];
-    let charactersMap = {};
-    let teletypeTitles = {};
+    let charactersList = [];
     let currentTab = "chrono";
     let activeCharFilter = null;
     let editingTag = null;
 
-    let customNames = JSON.parse(localStorage.getItem("uma_custom_names") || "{}");
-    let customAvatars = JSON.parse(localStorage.getItem("uma_custom_avatars") || "{}");
-
-    // Универсальный прокси для обхода CORS в браузере
-    async function fetchWithProxy(targetUrl) {
-      const proxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
-      ];
-      for (const p of proxies) {
-        try {
-          const res = await fetch(p);
-          if (res.ok) return await res.text();
-        } catch (e) {}
-      }
-      throw new Error(`Не удалось загрузить ${targetUrl}`);
-    }
-
-    // 1. Загрузка оглавления из Teletype
-    async function loadTeletypeTitles() {
-      try {
-        const html = await fetchWithProxy("https://teletype.media/@pwrdbysnow/allcomics");
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        doc.querySelectorAll("a[href*='t.me/umacity/']").forEach(a => {
-          const m = a.href.match(/t\.me\/umacity\/(\d+)/);
-          if (m) {
-            const id = parseInt(m[1], 10);
-            let title = a.textContent.trim().replace(/^[•\-\—\*\s]+/, '');
-            if (title.length > 1) teletypeTitles[id] = title;
-          }
-        });
-      } catch (e) {
-        console.warn("Teletype не загрузился, используем заголовки из постов:", e);
-      }
-    }
-
-    // 2. Прямой парсинг канала https://t.me/s/umacity
-    async function scrapeTelegramChannel(pagesCount = 4) {
-      document.getElementById("statusText").innerText = "Сбор постов из @umacity...";
-      let beforeId = null;
-      let rawPosts = [];
-
-      for (let i = 0; i < pagesCount; i++) {
-        const url = beforeId ? `https://t.me/s/umacity?before=${beforeId}` : `https://t.me/s/umacity`;
-        try {
-          const html = await fetchWithProxy(url);
-          const doc = new DOMParser().parseFromString(html, "text/html");
-          const msgs = doc.querySelectorAll(".tgme_widget_message");
-          if (!msgs.length) break;
-
-          let oldest = null;
-          msgs.forEach(msg => {
-            const postAttr = msg.getAttribute("data-post");
-            if (!postAttr) return;
-            const id = parseInt(postAttr.split("/").pop(), 10);
-            if (!oldest || id < oldest) oldest = id;
-
-            const textEl = msg.querySelector(".tgme_widget_message_text");
-            const text = textEl ? textEl.innerText.trim() : "";
-
-            // Фото
-            const photos = [];
-            msg.querySelectorAll(".tgme_widget_message_photo_wrap").forEach(p => {
-              const bg = p.style.backgroundImage;
-              const match = bg.match(/url\(['"]?([^'"]+)['"]?\)/);
-              if (match) photos.push(match[1]);
-            });
-
-            if (photos.length > 0 && (text.toLowerCase().includes("#переводы") || text.toLowerCase().includes("#перевод"))) {
-              rawPosts.push({ id, text, photos });
-            }
-          });
-
-          if (!oldest || oldest === beforeId) break;
-          beforeId = oldest;
-        } catch (err) {
-          console.error("Ошибка шага скрапинга:", err);
-          break;
-        }
-      }
-
-      processParsedPosts(rawPosts);
-    }
-
-    // Обработка постов и названий
-    function processParsedPosts(posts) {
-      allComics = [];
-      charactersMap = {};
-
-      posts.forEach(p => {
-        const tags = (p.text.match(/#[A-Za-z0-9_а-яА-ЯёЁ]+/g) || []).map(t => t.slice(1).toLowerCase());
-        const authorTag = tags.find(t => t.startsWith("author_"));
-        const author = authorTag ? authorTag.replace("author_", "") : null;
-
-        const charTags = tags.filter(t => !["переводы", "перевод", "комикс", "манга", "арт"].includes(t) && !t.startsWith("author_"));
-        const primaryChar = charTags[0] || "other";
-
-        const nameRu = customNames[primaryChar] || DEFAULT_NAMES[primaryChar] || primaryChar.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
-        // Название из Teletype или первая строка
-        let title = teletypeTitles[p.id];
-        if (!title) {
-          const lines = p.text.split("\n").map(l => l.trim()).filter(Boolean);
-          for (let line of lines) {
-            if (line.startsWith("#") || line.startsWith("http") || /^(автор|арт|source):/i.test(line)) continue;
-            let clean = line.replace(/#[A-Za-z0-9_а-яА-ЯёЁ]+/g, '').trim().replace(/^[«"'\-\—\s]+|[»"'\-\—\s]+$/g, '');
-            if (clean.length > 1) { title = clean; break; }
-          }
-        }
-        if (!title) title = nameRu;
-
-        const comic = {
-          id: p.id,
-          title: title,
-          text: p.text,
-          author: author,
-          primaryChar: primaryChar,
-          primaryCharName: nameRu,
-          tags: tags,
-          images: p.photos
-        };
-
-        allComics.push(comic);
-
-        if (!charactersMap[primaryChar]) {
-          charactersMap[primaryChar] = {
-            tag: primaryChar,
-            nameRu: nameRu,
-            count: 0,
-            avatar: p.photos[0] || null
-          };
-        }
-        charactersMap[primaryChar].count++;
-      });
-
-      allComics.sort((a, b) => b.id - a.id);
-    }
-
-    // Рендер и интерфейс
     function updateAdminBtnUI() {
       const btn = document.getElementById("adminBtn");
       btn.innerText = isAdmin ? "🔓" : "🔒";
@@ -305,6 +109,19 @@
       }
     }
 
+    async function loadData() {
+      updateAdminBtnUI();
+      try {
+        const res = await fetch(`data.json?t=${Date.now()}`);
+        const data = await res.json();
+        allComics = data.comics;
+        charactersList = data.characters;
+        renderCurrentView();
+      } catch (err) {
+        console.error("Ошибка загрузки data.json", err);
+      }
+    }
+
     function switchTab(tab, charTag = null) {
       currentTab = tab;
       activeCharFilter = charTag;
@@ -313,7 +130,8 @@
 
       const indicator = document.getElementById("folderIndicator");
       if (charTag) {
-        document.getElementById("folderLabel").innerText = `📁 ${customNames[charTag] || DEFAULT_NAMES[charTag] || charTag}`;
+        const charObj = charactersList.find(c => c.tag === charTag);
+        document.getElementById("folderLabel").innerText = `📁 ${customNames[charTag] || charObj?.name_ru || charTag}`;
         indicator.classList.remove("hidden");
       } else {
         indicator.classList.add("hidden");
@@ -342,12 +160,12 @@
       let list = allComics;
 
       if (activeCharFilter) {
-        list = list.filter(c => c.primaryChar === activeCharFilter || c.tags.includes(activeCharFilter));
+        list = list.filter(c => c.primary_char === activeCharFilter || c.tags.includes(activeCharFilter));
       }
       if (query) {
         list = list.filter(c => 
           c.title.toLowerCase().includes(query) ||
-          (customNames[c.primaryChar] || c.primaryCharName).toLowerCase().includes(query) ||
+          (customNames[c.primary_char] || c.primary_char_name).toLowerCase().includes(query) ||
           c.tags.some(t => t.includes(query)) ||
           (c.author && c.author.toLowerCase().includes(query))
         );
@@ -360,11 +178,11 @@
 
       list.forEach(c => {
         const card = document.createElement("div");
-        card.className = "bg-slate-800/90 rounded-lg overflow-hidden border border-slate-700/60 flex flex-col cursor-pointer active:scale-95 transition shadow-sm";
+        card.className = "bg-slate-800/90 rounded-lg overflow-hidden border border-slate-700/60 flex flex-col cursor-pointer active:scale-95 transition";
         card.onclick = () => openReader(c);
 
         const cover = c.images[0] || '';
-        const name = customNames[c.primaryChar] || c.primaryCharName;
+        const name = customNames[c.primary_char] || c.primary_char_name;
 
         card.innerHTML = `
           <div class="aspect-[4/5] w-full bg-slate-950 relative overflow-hidden flex items-center justify-center p-0.5">
@@ -374,7 +192,7 @@
             </div>
           </div>
           <div class="p-1.5 flex flex-col justify-between flex-1">
-            <span class="text-[11px] font-medium text-slate-100 line-clamp-2 leading-tight" title="${c.title}">${c.title}</span>
+            <span class="text-[11px] font-medium text-slate-100 line-clamp-2 leading-tight">${c.title}</span>
             <div class="flex justify-between items-center mt-1 pt-1 border-t border-slate-700/40 text-[9px] text-slate-400">
               <span class="text-sky-400 truncate max-w-[65px]">${name}</span>
               <span>#${c.id}</span>
@@ -388,10 +206,10 @@
     function renderCharacters(query) {
       const container = document.getElementById("charsGrid");
       container.innerHTML = "";
-      let chars = Object.values(charactersMap).sort((a, b) => b.count - a.count);
+      let chars = [...charactersList].sort((a, b) => b.count - a.count);
 
       if (query) {
-        chars = chars.filter(c => (customNames[c.tag] || c.nameRu).toLowerCase().includes(query) || c.tag.toLowerCase().includes(query));
+        chars = chars.filter(c => (customNames[c.tag] || c.name_ru).toLowerCase().includes(query) || c.tag.toLowerCase().includes(query));
       }
 
       chars.forEach(char => {
@@ -399,7 +217,7 @@
         card.className = "bg-slate-800/80 rounded-xl p-2 border border-slate-700/60 flex flex-col items-center text-center cursor-pointer active:scale-95 transition relative";
         
         const avatar = customAvatars[char.tag] || char.avatar || 'https://via.placeholder.com/150';
-        const name = customNames[char.tag] || char.nameRu;
+        const name = customNames[char.tag] || char.name_ru;
 
         card.innerHTML = `
           <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-sky-400/60 mb-1.5 bg-slate-950 flex items-center justify-center">
@@ -425,7 +243,7 @@
     }
 
     function openReader(comic) {
-      const name = customNames[comic.primaryChar] || comic.primaryCharName;
+      const name = customNames[comic.primary_char] || comic.primary_char_name;
       document.getElementById("readerTitle").innerText = comic.title;
       document.getElementById("readerSubTitle").innerText = `${name} ${comic.author ? '• @' + comic.author : ''}`;
       document.getElementById("readerTgLink").href = `https://t.me/umacity/${comic.id}`;
@@ -470,16 +288,7 @@
       renderCurrentView();
     }
 
-    // Запуск приложения
-    async function startApp() {
-      updateAdminBtnUI();
-      await loadTeletypeTitles();
-      await scrapeTelegramChannel(6);
-      document.getElementById("statusBox").classList.add("hidden");
-      renderCurrentView();
-    }
-
-    startApp();
+    loadData();
   </script>
 </body>
 </html>
