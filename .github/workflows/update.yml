@@ -2,8 +2,8 @@ name: Update Comics Data
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # Запуск каждые 2 часа
-  workflow_dispatch: # Позволяет запускать вручную кнопкой
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: setup-python@v5
@@ -31,4 +33,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update comics data [skip ci]" && git push)
+          git diff --staged --quiet || (git commit -m "Auto-update data.json [skip ci]" && git push)
